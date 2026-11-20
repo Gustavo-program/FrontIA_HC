@@ -1,7 +1,7 @@
 # Sistema Web de Gestión de Historias Clínicas Electrónicas (HC-INSN)
 ### Instituto Nacional de Salud del Niño – Breña (Versión Angular 22)
 
-Aplicación web desarrollada siguiendo al 100% el **Documento de Especificación de Requerimientos de Software (SRS)** y el modelo de base de datos relacional de PostgreSQL (`modelo_digitalizacion_historias_clinicas_corregido.sql` + `db/tablas_adicionales.sql`).
+Aplicación web desarrollada siguiendo al 100% el **Documento de Especificación de Requerimientos de Software (SRS)** y el modelo de base de datos relacional unificado de PostgreSQL (`db/hc_insn_database.sql`).
 
 ---
 
@@ -74,5 +74,4 @@ Tal como se solicitó: *"que si tengo que editar el back o la base de datos sea 
 
 ## 🗄️ 5. Base de Datos PostgreSQL
 
-- **Script Base**: `modelo_digitalizacion_historias_clinicas_corregido.sql`
-- **Script Complementario (Citas, Horarios, Atención, Recetas y Seeds)**: `db/tablas_adicionales.sql`
+- **Script Único e Idempotente (Estructura completa + Datos Semilla)**: `db/hc_insn_database.sql`

@@ -11,7 +11,6 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { correlationIdInterceptor } from './core/interceptors/correlation-id.interceptor';
-import { mockApiInterceptor } from './core/mocks/mock-api.interceptor';
 
 registerLocaleData(localeEsPe, 'es-PE');
 
@@ -24,8 +23,7 @@ export const appConfig: ApplicationConfig = {
         correlationIdInterceptor,
         authInterceptor,
         loadingInterceptor,
-        errorInterceptor,
-        mockApiInterceptor
+        errorInterceptor
       ])
     ),
     provideNoopAnimations(),

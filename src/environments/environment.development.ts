@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
   apiUrl: '/api/v1',
-  useMockApi: true,
+  useMockApi: false,
   sessionTimeoutMinutes: 15
 };

@@ -1,5 +1,5 @@
 import { HttpInterceptorFn, HttpResponse, HttpErrorResponse } from '@angular/common/http';
-import { of, delay, throwError } from 'rxjs';
+import { of, delay, throwError, catchError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   MOCK_USUARIOS,
@@ -87,9 +87,18 @@ function initStorage() {
 initStorage();
 
 export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
-  if (!environment.useMockApi || !req.url.includes('/api/v1')) {
+  if (!req.url.includes('/api/v1')) {
     return next(req);
   }
+
+  if (!environment.useMockApi) {
+    return next(req);
+  }
+
+  return handleFallback(req, next);
+};
+
+const handleFallback: HttpInterceptorFn = (req, next) => {
 
   const url = req.url.substring(req.url.indexOf('/api/v1') + 7);
   const method = req.method;
