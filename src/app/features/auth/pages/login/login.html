@@ -1,0 +1,55 @@
+<div class="login-box">
+  <h3 class="login-title">Iniciar Sesión</h3>
+  <p class="login-sub">Ingrese sus credenciales institucionales para acceder</p>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Usuario Institucional</mat-label>
+      <input matInput formControlName="nombreUsuario" placeholder="Ej. admin o dr.garcia" autocomplete="username">
+      <mat-icon matSuffix>account_circle</mat-icon>
+      @if (loginForm.get('nombreUsuario')?.hasError('required') && loginForm.get('nombreUsuario')?.touched) {
+        <mat-error>El usuario es requerido</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Contraseña</mat-label>
+      <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" autocomplete="current-password">
+      <button type="button" mat-icon-button matSuffix (click)="hidePassword.set(!hidePassword())" [attr.aria-label]="'Ocultar contraseña'">
+        <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
+        <mat-error>La contraseña es requerida</mat-error>
+      }
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" type="submit" class="submit-btn" [disabled]="loading()">
+      @if (loading()) {
+        <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+      } @else {
+        <span class="btn-text">Ingresar al Sistema</span>
+      }
+    </button>
+  </form>
+
+  <div class="quick-access">
+    <p class="quick-title">Accesos Rápidos Demo (Click para autocompletar):</p>
+    <div class="chips-container">
+      <button type="button" class="demo-chip" (click)="fillQuickUser('admin', 'admin123')">
+        <strong>Admin</strong> (admin / admin123)
+      </button>
+      <button type="button" class="demo-chip" (click)="fillQuickUser('dr.garcia', 'doc123')">
+        <strong>Doctor</strong> (dr.garcia / doc123)
+      </button>
+      <button type="button" class="demo-chip" (click)="fillQuickUser('arch.lopez', 'dig123')">
+        <strong>Digitalizador</strong> (arch.lopez / dig123)
+      </button>
+      <button type="button" class="demo-chip" (click)="fillQuickUser('adm.torres', 'adm123')">
+        <strong>Admisión</strong> (adm.torres / adm123)
+      </button>
+      <button type="button" class="demo-chip" (click)="fillQuickUser('rrhh.flores', 'rrhh123')">
+        <strong>RR. HH.</strong> (rrhh.flores / rrhh123)
+      </button>
+    </div>
+  </div>
+</div>

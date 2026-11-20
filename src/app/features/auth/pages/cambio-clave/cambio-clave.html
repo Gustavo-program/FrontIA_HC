@@ -1,0 +1,33 @@
+<div class="cambio-box">
+  <div class="icon-header">
+    <mat-icon class="lock-icon">lock_reset</mat-icon>
+    <h3>Cambio Obligatorio de Contraseña</h3>
+    <p>Por políticas de seguridad del INSN, debe actualizar su contraseña para continuar.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Contraseña Actual</mat-label>
+      <input matInput type="password" formControlName="claveActual">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Nueva Contraseña (mínimo 8 caracteres)</mat-label>
+      <input matInput type="password" formControlName="nuevaClave">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Confirmar Nueva Contraseña</mat-label>
+      <input matInput type="password" formControlName="confirmarClave">
+    </mat-form-field>
+
+    <div class="d-flex gap-2 mt-2">
+      <button mat-stroked-button type="button" class="cancel-btn" (click)="cancelar()">
+        Cancelar / Volver
+      </button>
+      <button mat-raised-button color="primary" type="submit" class="submit-btn" [disabled]="loading()">
+        Guardar Nueva Contraseña
+      </button>
+    </div>
+  </form>
+</div>

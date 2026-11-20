@@ -1,0 +1,24 @@
+.horarios-page {
+  .form-card, .table-card {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .alert-info-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  .cupos-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+  }
+}

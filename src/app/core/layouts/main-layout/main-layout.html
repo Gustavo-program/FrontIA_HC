@@ -1,0 +1,71 @@
+<div class="layout-container">
+  @if (loadingService.loading()) {
+    <mat-progress-bar mode="indeterminate" class="global-progress"></mat-progress-bar>
+  }
+
+  <mat-toolbar color="primary" class="main-toolbar">
+    <button mat-icon-button (click)="toggleSidenav()" aria-label="Alternar menú">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <div class="app-brand" routerLink="/inicio">
+      <span class="brand-insn">INSN</span>
+      <span class="brand-title">Historias Clínicas</span>
+    </div>
+
+    <span class="toolbar-spacer"></span>
+
+    <div class="user-chip" [matMenuTriggerFor]="userMenu">
+      <div class="user-avatar">
+        <mat-icon>person</mat-icon>
+      </div>
+      <div class="user-meta">
+        <span class="user-name">{{ store.nombreCompleto() }}</span>
+        <span class="user-role">{{ store.roles().join(', ') }}</span>
+      </div>
+      <mat-icon class="arrow-down">arrow_drop_down</mat-icon>
+    </div>
+
+    <mat-menu #userMenu="matMenu" xPosition="before">
+      <div class="menu-header">
+        <p class="menu-name">{{ store.nombreCompleto() }}</p>
+        <p class="menu-email">{{ store.usuario()?.correo }}</p>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item routerLink="/cambio-clave">
+        <mat-icon>lock_reset</mat-icon>
+        <span>Cambiar Contraseña</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()" class="logout-btn">
+        <mat-icon color="warn">logout</mat-icon>
+        <span class="text-error">Cerrar Sesión</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav [opened]="sidenavOpened()"
+                 [mode]="isMobile() ? 'over' : 'side'"
+                 class="main-sidenav">
+      <div class="nav-header">
+        <span class="nav-subtitle">Módulos del Sistema</span>
+      </div>
+      <mat-nav-list>
+        @for (item of filteredNavItems(); track item.route) {
+          <a mat-list-item [routerLink]="item.route"
+             routerLinkActive="active-link"
+             (click)="closeIfMobile()">
+            <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+            <span matListItemTitle>{{ item.label }}</span>
+          </a>
+        }
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="main-content">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

@@ -1,0 +1,107 @@
+.detalle-page {
+  .split-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+    }
+
+    .panel-pdf, .panel-form {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 12px;
+
+        mat-icon { color: #005cb2; }
+        h3 { margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; }
+      }
+    }
+
+    .panel-form {
+      .alert-info-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 16px;
+        mat-icon { font-size: 20px; width: 20px; height: 20px; }
+      }
+
+      .fields-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        max-height: 640px;
+        overflow-y: auto;
+        padding-right: 8px;
+
+        .field-item {
+          background: #f8fafc;
+          border-radius: 8px;
+          padding: 12px;
+          border-left: 4px solid #005cb2;
+
+          &.field-warning {
+            border-left-color: #ed6c02;
+            background: #fffbf5;
+          }
+
+          .field-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+
+            .field-label {
+              font-weight: 600;
+              font-size: 13px;
+              color: #334155;
+            }
+
+            .field-badges {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+
+              .btn-ilegit {
+                height: 28px;
+                line-height: 28px;
+                font-size: 11px;
+                padding: 0 8px;
+              }
+            }
+          }
+
+          mat-form-field {
+            margin-bottom: -16px;
+
+            .custom-textarea {
+              min-height: 85px;
+              max-height: 200px;
+              line-height: 1.5;
+              resize: vertical;
+              overflow-y: auto !important;
+              font-family: inherit;
+              font-size: 13.5px;
+              padding: 4px 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}

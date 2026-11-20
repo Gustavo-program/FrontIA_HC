@@ -1,0 +1,181 @@
+<div class="historia-page">
+  <app-page-header
+    [title]="'Historia Clínica: ' + (historia()?.numeroHistoria || '')"
+    [subtitle]="'Paciente: ' + (paciente() | nombreCompleto) + ' | Establecimiento: ' + (historia()?.establecimiento || 'INSN Breña')">
+  </app-page-header>
+
+  <mat-tab-group class="historia-tabs">
+    <!-- TAB 1: Ficha del Paciente y Filiación -->
+    <mat-tab label="Ficha del Paciente y Filiación">
+      <div class="p-3">
+        <mat-card class="info-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar color="primary">person</mat-icon>
+            <mat-card-title>Datos Personales de Identificación</mat-card-title>
+            <mat-card-subtitle>Información demográfica validada en base de datos del INSN</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="mt-3">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">Nombres y Apellidos:</span>
+                <span class="val highlight">{{ paciente() | nombreCompleto }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Documento de Identidad (DNI):</span>
+                <span class="val">{{ paciente()?.documentoPrincipal?.numeroDocumento }} ({{ paciente()?.documentoPrincipal?.estadoValidacion }})</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Fecha de Nacimiento:</span>
+                <span class="val">{{ paciente()?.fechaNacimiento | date:'dd/MM/yyyy' }} ({{ paciente()?.fechaNacimiento | edad }})</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Sexo Registrado:</span>
+                <span class="val">{{ paciente()?.sexoRegistrado }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Lugar de Origen / Nacimiento:</span>
+                <span class="val">{{ paciente()?.lugarNacimiento }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Estado de la Historia Clínica:</span>
+                <span class="val status-badge-active">{{ historia()?.estadoHistoriaNombre || 'ACTIVA' }}</span>
+              </div>
+            </div>
+
+            <h3 class="mt-4 mb-2 d-flex align-center gap-2">
+              <mat-icon color="primary">family_restroom</mat-icon> Familiar o Representante Responsable
+            </h3>
+            @for (r of paciente()?.responsables; track r.responsableId) {
+              <div class="resp-box">
+                <div class="resp-header">
+                  <strong>{{ r.parentesco }}: {{ r.nombres }} {{ r.apellidoPaterno }} {{ r.apellidoMaterno || '' }}</strong>
+                  <span class="doc-badge">DNI: {{ r.numeroDocumento }}</span>
+                </div>
+                <div class="resp-details mt-2">
+                  <p><strong>Teléfono / WhatsApp:</strong> {{ r.telefonoWhatsapp || r.telefono || 'Sin teléfono' }}</p>
+                  <p><strong>Correo Electrónico:</strong> {{ r.correo || 'No registrado' }}</p>
+                  <p><strong>Dirección:</strong> {{ r.direccion }}</p>
+                </div>
+              </div>
+            } @empty {
+              <p class="text-muted">No se registran contactos de referencia adicionales.</p>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- TAB 2: Atenciones Médicas Registradas -->
+    <mat-tab label="Atenciones Médicas Registradas">
+      <div class="p-3">
+        <div class="timeline">
+          @for (a of atenciones(); track a.atencionId) {
+            <mat-card class="timeline-card mb-3">
+              <mat-card-header class="d-flex justify-between align-start">
+                <div>
+                  <div class="d-flex align-center gap-2">
+                    <span class="service-chip">{{ a.servicioNombre || 'CONSULTA MÉDICA' }}</span>
+                    <span class="date-chip">{{ a.fechaAtencion | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                  <h3 class="medico-title mt-2">{{ a.medicoNombre }}</h3>
+                </div>
+                @if (a.esExtraidoPorIA) {
+                  <span class="badge-ia">
+                    <mat-icon>smart_toy</mat-icon> Incorporado por Digitalización / IA
+                  </span>
+                }
+              </mat-card-header>
+
+              <mat-card-content class="mt-3">
+                <div class="section-block">
+                  <span class="section-label">Motivo de Atención / Solicitud:</span>
+                  <p class="section-text">{{ a.motivoConsulta }}</p>
+                </div>
+
+                @if (a.observaciones) {
+                  <div class="section-block mt-3">
+                    <span class="section-label">Hallazgos Clínicos Relevantes / Examen Físico:</span>
+                    <p class="section-text findings-box">{{ a.observaciones }}</p>
+                  </div>
+                }
+
+                @if (a.diagnosticos && a.diagnosticos.length > 0) {
+                  <div class="section-block mt-3">
+                    <span class="section-label">Diagnósticos Clínicos (CIE-10):</span>
+                    <div class="d-flex flex-wrap gap-2 mt-1">
+                      @for (d of a.diagnosticos; track d.atencionDiagnosticoId || d.cie10Id) {
+                        <div class="diag-chip">
+                          <strong class="cie-code">{{ d.cie10?.codigo || d.cie10Id }}</strong>
+                          <span class="cie-desc">{{ d.cie10?.descripcion || d.observaciones }}</span>
+                          <span class="diag-type">({{ d.tipo === 'PRINCIPAL' ? 'Principal' : 'Secundario' }}{{ d.observaciones ? ' - ' + d.observaciones : '' }})</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                @if (a.recomendaciones) {
+                  <div class="section-block mt-3">
+                    <span class="section-label">Plan Terapéutico y Recomendaciones:</span>
+                    <p class="section-text plan-box">{{ a.recomendaciones }}</p>
+                  </div>
+                }
+              </mat-card-content>
+            </mat-card>
+          } @empty {
+            <div class="empty-state py-4 text-center">
+              <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #94a3b8;">medical_information</mat-icon>
+              <p class="mt-2 text-muted">No hay registros de atenciones para esta historia clínica.</p>
+            </div>
+          }
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- TAB 3: Expediente Digitalizado (PDF) -->
+    <mat-tab label="Expediente Digitalizado (PDF)">
+      <div class="p-3">
+        @if (documentos().length > 0 && pdfUrl()) {
+          <!-- Listado de documentos digitalizados asociados -->
+          <div class="docs-header mb-3">
+            <h4 class="mb-2">Documentos Digitalizados Vinculados a la HC:</h4>
+            <div class="d-flex flex-wrap gap-2">
+              @for (doc of documentos(); track doc.documentoClinicoId) {
+                <div class="doc-item-badge">
+                  <mat-icon>picture_as_pdf</mat-icon>
+                  <div>
+                    <strong>{{ doc.nombreArchivoOriginal }}</strong>
+                    <span class="doc-meta">{{ doc.recibidoEn | date:'dd/MM/yyyy HH:mm' }} | {{ doc.numeroPaginas || 2 }} pág. | Confiabilidad: {{ doc.confiabilidadPromedio || 94 }}%</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Visor del PDF tal cual (archivo original escaneado) -->
+          <mat-card class="pdf-card">
+            <mat-card-content class="p-0">
+              <app-pdf-viewer [url]="pdfUrl()!" height="760px"></app-pdf-viewer>
+            </mat-card-content>
+          </mat-card>
+        } @else {
+          <mat-card class="empty-card text-center py-5">
+            <mat-card-content class="d-flex flex-column align-center justify-center p-4">
+              <mat-icon style="font-size: 56px; width: 56px; height: 56px; color: #94a3b8;">folder_off</mat-icon>
+              <h3 class="mt-3 text-secondary">Sin Documentos Físicos Escaneados</h3>
+              <p class="text-muted mt-2" style="max-width: 580px; line-height: 1.5;">
+                Este paciente cuenta con su <strong>Historia Clínica Electrónica</strong> gestionada directamente en el sistema.
+                No cuenta con expedientes físicos antiguos digitalizados o formatos de teleinterconsulta externos adjuntos.
+              </p>
+              <div class="mt-4">
+                <a mat-flat-button color="primary" routerLink="/digitalizacion">
+                  <mat-icon>upload_file</mat-icon> Digitalizar Nuevo Expediente
+                </a>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

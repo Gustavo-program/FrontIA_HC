@@ -1,0 +1,153 @@
+<div class="digitalizacion-page">
+  <app-page-header
+    title="Digitalización de Historias Clínicas"
+    subtitle="Carga de expedientes PDF con extracción óptica inteligente (OCR / IA)">
+    <div actions>
+      <button mat-stroked-button (click)="cargarDocumentos()">
+        <mat-icon>refresh</mat-icon> Actualizar
+      </button>
+    </div>
+  </app-page-header>
+
+  <!-- Zona de Drag & Drop -->
+  <mat-card class="upload-card">
+    <mat-card-content>
+      <div class="drop-zone"
+           [class.drag-over]="dragOver()"
+           (drop)="onDrop($event)"
+           (dragover)="onDragOver($event)"
+           (dragleave)="onDragLeave()">
+        <mat-icon class="upload-icon">cloud_upload</mat-icon>
+        <h3>Arrastre y suelte expedientes PDF aquí</h3>
+        <p>O seleccione los archivos desde su computadora (máximo 10MB por documento)</p>
+
+        <label class="file-label">
+          <input type="file" multiple accept="application/pdf" (change)="onFileSelected($event)">
+          <span mat-raised-button color="primary">Examinar Archivos</span>
+        </label>
+      </div>
+
+      @if (isUploading()) {
+        <div class="upload-progress">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          <span>Extrayendo y analizando texto con IA...</span>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tabla de Seguimiento de Documentos -->
+  <mat-card class="table-card mt-4">
+    <mat-card-header>
+      <mat-card-title>Expedientes Digitalizados Recientes</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="table-container">
+      <table mat-table [dataSource]="documentos()" class="w-100">
+        <!-- Archivo -->
+        <ng-container matColumnDef="nombreArchivo">
+          <th mat-header-cell *matHeaderCellDef>Documento</th>
+          <td mat-cell *matCellDef="let doc">
+            <div class="file-name-cell">
+              <mat-icon class="pdf-icon">picture_as_pdf</mat-icon>
+              <div>
+                <span class="file-title">{{ doc.nombreArchivoOriginal }}</span>
+                @if (doc.numeroHistoria) {
+                  <span class="file-sub">HC: {{ doc.numeroHistoria }}</span>
+                }
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Fecha -->
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha Carga</th>
+          <td mat-cell *matCellDef="let doc">{{ doc.recibidoEn | date:'dd/MM/yyyy HH:mm' }}</td>
+        </ng-container>
+
+        <!-- Páginas -->
+        <ng-container matColumnDef="paginas">
+          <th mat-header-cell *matHeaderCellDef>Págs</th>
+          <td mat-cell *matCellDef="let doc">{{ doc.numeroPaginas || '-' }}</td>
+        </ng-container>
+
+        <!-- Confiabilidad -->
+        <ng-container matColumnDef="confiabilidad">
+          <th mat-header-cell *matHeaderCellDef>Confiabilidad IA</th>
+          <td mat-cell *matCellDef="let doc">
+            @if (doc.confiabilidadPromedio !== undefined) {
+              <app-confidence-badge [confidence]="doc.confiabilidadPromedio"></app-confidence-badge>
+            } @else {
+              <span class="text-muted">En proceso...</span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Estado -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let doc">
+            <app-status-chip [status]="doc.estadoProcesamiento"></app-status-chip>
+          </td>
+        </ng-container>
+
+        <!-- Resultado -->
+        <ng-container matColumnDef="resultado">
+          <th mat-header-cell *matHeaderCellDef>Destino</th>
+          <td mat-cell *matCellDef="let doc">
+            @if (doc.confiabilidadPromedio && doc.confiabilidadPromedio >= 85) {
+              <span class="badge-auto-hc" matTooltip="Cumple umbral ≥ 85% - Registrado automáticamente en la Historia Clínica">
+                <mat-icon>check_circle</mat-icon> Registrado en HC
+              </span>
+            } @else if (doc.estadoProcesamiento === 'REQUIERE_REVISION') {
+              <span class="badge-req-val" matTooltip="Confiabilidad < 85% - Derivado a la bandeja de validación manual">
+                <mat-icon>pending_actions</mat-icon> Enviado a Validación
+              </span>
+            } @else if (doc.estadoProcesamiento === 'ERROR') {
+              <span class="badge-error">
+                <mat-icon>error</mat-icon> Error Lectura
+              </span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Acciones -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let doc">
+            <div class="d-flex align-center gap-1">
+              @if (doc.enlaceHC) {
+                <a mat-button color="primary" [routerLink]="doc.enlaceHC" title="Ver Historia Clínica">
+                  <mat-icon>visibility</mat-icon> Ver HC
+                </a>
+              } @else if (doc.revisionId) {
+                <a mat-raised-button color="accent" [routerLink]="['/validacion', doc.revisionId]" title="Revisar en bandeja">
+                  <mat-icon>fact_check</mat-icon> Validar
+                </a>
+              } @else if (doc.estadoProcesamiento === 'ERROR') {
+                <button mat-stroked-button color="warn" (click)="reprocesar(doc)" title="Reintentar lectura OCR">
+                  <mat-icon>refresh</mat-icon> Reintentar
+                </button>
+              }
+
+              <button mat-icon-button color="warn" (click)="eliminar(doc)" title="Eliminar documento escaneado">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      @if (documentos().length === 0) {
+        <app-empty-state
+          icon="upload_file"
+          title="No hay documentos procesados"
+          description="Cargue expedientes clínicos escaneados para iniciar la digitalización inteligente.">
+        </app-empty-state>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

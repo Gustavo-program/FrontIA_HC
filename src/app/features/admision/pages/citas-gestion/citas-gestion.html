@@ -1,0 +1,235 @@
+<div class="citas-page">
+  <app-page-header
+    title="Programación y Gestión de Citas Médicas"
+    subtitle="Agendamiento en cupos de 30 min (RN-01) y administración de citas">
+  </app-page-header>
+
+  <mat-tab-group class="citas-tabs" [selectedIndex]="selectedTab()" (selectedIndexChange)="selectedTab.set($event)">
+    <!-- PESTAÑA 1: AGENDAR / REPROGRAMAR CITA -->
+    <mat-tab [label]="modoEdicion() ? 'Reprogramar / Editar Cita' : 'Agendar Nueva Cita'">
+      <div class="tab-padding">
+        <mat-card class="agendar-card">
+          <mat-card-content>
+            @if (modoEdicion()) {
+              <div class="alert-info-box mb-3 d-flex align-center justify-between" style="background: #eff6ff; color: #1d4ed8; padding: 12px; border-radius: 8px;">
+                <div class="d-flex align-center gap-2">
+                  <mat-icon>edit_calendar</mat-icon>
+                  <span>Modo Edición: Modifique la fecha, médico o cupo para reprogramar la cita médica.</span>
+                </div>
+                <button mat-stroked-button color="warn" (click)="cancelarEdicion()">Cancelar Edición</button>
+              </div>
+            }
+
+            <div class="mb-3">
+              <label class="section-label">1. Buscar Paciente:</label>
+              <app-paciente-search [pacientePreseleccionado]="pacienteSeleccionado()" (pacienteSelected)="onPaciente($event)"></app-paciente-search>
+              @if (pacienteSeleccionado()) {
+                <div class="pac-alert">
+                  Paciente seleccionado: <strong>{{ pacienteSeleccionado() | nombreCompleto }}</strong> (HC: {{ pacienteSeleccionado()?.numeroHistoria }})
+                </div>
+              }
+            </div>
+
+            <form [formGroup]="agendarForm" class="form-flow">
+              <label class="section-label">2. Especialidad, Médico y Fecha:</label>
+              <div class="row-3">
+                <mat-form-field appearance="outline">
+                  <mat-label>Especialidad Médica</mat-label>
+                  <mat-select formControlName="especialidadId">
+                    @for (e of especialidades(); track e.especialidadId) {
+                      <mat-option [value]="e.especialidadId">{{ e.nombre }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Médico Especialista</mat-label>
+                  <mat-select formControlName="medicoId">
+                    @for (m of medicos(); track m.medicoId) {
+                      <mat-option [value]="m.medicoId">Dr(a). {{ m.personal.nombres }} {{ m.personal.apellidoPaterno }} (CMP: {{ m.numeroCmp }})</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Fecha de Atención</mat-label>
+                  <input matInput [matDatepicker]="pickerFechaCita" formControlName="fecha" placeholder="DD/MM/AAAA">
+                  <mat-datepicker-toggle matIconSuffix [for]="pickerFechaCita"></mat-datepicker-toggle>
+                  <mat-datepicker #pickerFechaCita></mat-datepicker>
+                </mat-form-field>
+              </div>
+
+              <label class="section-label mt-2">3. Seleccione Cupo de Atención (Turno de 6h con 12 cupos de 30 min):</label>
+              <app-cupo-selector
+                [cupos]="cupos()"
+                [cupoSeleccionado]="cupoSeleccionado()"
+                (cupoChange)="onCupo($event)">
+              </app-cupo-selector>
+
+              <label class="section-label mt-2">4. Motivo de Consulta:</label>
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Motivo</mat-label>
+                <textarea matInput formControlName="motivo" rows="2" placeholder="Describa el motivo o derivación"></textarea>
+              </mat-form-field>
+
+              <div class="submit-box d-flex gap-2">
+                @if (modoEdicion()) {
+                  <button mat-stroked-button type="button" (click)="cancelarEdicion()">
+                    Cancelar
+                  </button>
+                }
+                <button mat-raised-button color="primary" type="button" (click)="confirmarCita()" [disabled]="guardando()">
+                  <mat-icon>{{ modoEdicion() ? 'save' : 'check' }}</mat-icon>
+                  {{ modoEdicion() ? 'Guardar Cambios de Cita' : 'Confirmar Cita (Aprobada - RN-04)' }}
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- PESTAÑA 2: LISTADO DE CITAS -->
+    <mat-tab label="Listado y Reprogramación de Citas">
+      <div class="tab-padding">
+        <!-- BARRA DE FILTROS AVANZADA (FECHA, ESPECIALIDAD, TEXTO, ESTADO) -->
+        <mat-card class="filter-card mb-3" style="box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+          <mat-card-content>
+            <div class="d-flex align-center justify-between mb-2 flex-wrap gap-2">
+              <div class="d-flex align-center gap-2">
+                <mat-icon color="primary">filter_list</mat-icon>
+                <strong style="font-size: 14px; color: #1e293b;">Filtros de Búsqueda de Citas Médicas</strong>
+              </div>
+              <div class="d-flex align-center gap-2">
+                <span class="badge-count" style="font-size: 12px; color: #64748b;">
+                  Mostrando <strong>{{ citasFiltradas().length }}</strong> de {{ citas().length }} citas
+                </span>
+                <button mat-button color="warn" (click)="limpiarFiltros()" title="Restablecer filtros">
+                  <mat-icon>clear_all</mat-icon> Limpiar Filtros
+                </button>
+              </div>
+            </div>
+
+            <div class="row-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+              <!-- Filtro por Fecha -->
+              <mat-form-field appearance="outline">
+                <mat-label>Filtrar por Fecha</mat-label>
+                <input matInput [matDatepicker]="pickerFiltroFecha" [ngModel]="filtroFecha()" (ngModelChange)="filtroFecha.set($event)" placeholder="DD/MM/AAAA">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerFiltroFecha"></mat-datepicker-toggle>
+                <mat-datepicker #pickerFiltroFecha></mat-datepicker>
+              </mat-form-field>
+
+              <!-- Filtro por Especialidad -->
+              <mat-form-field appearance="outline">
+                <mat-label>Filtrar por Especialidad</mat-label>
+                <mat-select [ngModel]="filtroEspecialidad()" (ngModelChange)="filtroEspecialidad.set($event)">
+                  <mat-option value="">Todas las Especialidades</mat-option>
+                  @for (e of especialidades(); track e.especialidadId) {
+                    <mat-option [value]="e.especialidadId">{{ e.nombre }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Filtro por Paciente o Doctor -->
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar Paciente, HC o Médico</mat-label>
+                <input matInput [ngModel]="filtroTexto()" (ngModelChange)="filtroTexto.set($event)" placeholder="Ej. Mateo, 2020891, García...">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+
+              <!-- Filtro por Estado -->
+              <mat-form-field appearance="outline">
+                <mat-label>Filtrar por Estado</mat-label>
+                <mat-select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)">
+                  <mat-option value="">Todos los Estados</mat-option>
+                  <mat-option value="APROBADA">Aprobada</mat-option>
+                  <mat-option value="PENDIENTE">Pendiente</mat-option>
+                  <mat-option value="ATENDIDA">Atendida</mat-option>
+                  <mat-option value="CANCELADA">Cancelada</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="table-card">
+          <mat-card-content class="table-container">
+            <table mat-table [dataSource]="citasFiltradas()" class="w-100">
+              <ng-container matColumnDef="fecha">
+                <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                <td mat-cell *matCellDef="let c">{{ c.fechaHoraInicio | date:'dd/MM/yyyy' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="hora">
+                <th mat-header-cell *matHeaderCellDef>Horario</th>
+                <td mat-cell *matCellDef="let c">{{ c.fechaHoraInicio | date:'HH:mm' }} - {{ c.fechaHoraFin | date:'HH:mm' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="paciente">
+                <th mat-header-cell *matHeaderCellDef>Paciente</th>
+                <td mat-cell *matCellDef="let c">
+                  <strong>{{ c.paciente | nombreCompleto }}</strong>
+                  <span class="d-block text-muted" style="font-size: 11px;">HC: {{ c.paciente?.numeroHistoria }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="doctor">
+                <th mat-header-cell *matHeaderCellDef>Doctor</th>
+                <td mat-cell *matCellDef="let c">
+                  Dr(a). {{ c.medico?.personal?.apellidoPaterno || 'García' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="especialidad">
+                <th mat-header-cell *matHeaderCellDef>Especialidad</th>
+                <td mat-cell *matCellDef="let c">{{ c.especialidad?.nombre || 'Pediatría General' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let c">
+                  <app-status-chip [status]="c.estado"></app-status-chip>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let c">
+                  <div class="d-flex align-center gap-1">
+                    @if (c.estado === 'PENDIENTE') {
+                      <button mat-flat-button color="primary" class="btn-aprobar-mini" (click)="aprobarCita(c)" title="Aprobar cita tras confirmar pago en caja / SIS (RN-03)">
+                        <mat-icon style="font-size: 16px; width: 16px; height: 16px; margin-right: 2px;">verified</mat-icon> Aprobar Pago
+                      </button>
+                    }
+                    <button mat-icon-button color="primary" (click)="editarCita(c)" title="Editar / Reprogramar cita">
+                      <mat-icon>edit_calendar</mat-icon>
+                    </button>
+                    @if (c.estado === 'APROBADA' || c.estado === 'PENDIENTE') {
+                      <button mat-icon-button color="accent" (click)="cancelarCita(c)" title="Cancelar cita">
+                        <mat-icon>cancel</mat-icon>
+                      </button>
+                    }
+                    <button mat-icon-button color="warn" (click)="eliminarCita(c)" title="Eliminar cita definitivamente">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+
+            @if (citasFiltradas().length === 0) {
+              <div class="p-4 text-center text-muted" style="padding: 30px;">
+                <mat-icon style="font-size: 40px; height: 40px; width: 40px; color: #94a3b8;">event_busy</mat-icon>
+                <p class="mt-2 mb-1" style="font-weight: 500;">No se encontraron citas con los filtros seleccionados.</p>
+                <button mat-stroked-button color="primary" (click)="limpiarFiltros()">Limpiar Filtros</button>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

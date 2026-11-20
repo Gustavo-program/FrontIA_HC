@@ -1,0 +1,81 @@
+<div class="pendientes-page">
+  <app-page-header
+    title="Bandeja de Citas Pendientes de Pago"
+    subtitle="Citas médicas generadas por Doctores en consulta (RN-03). Confirme el pago para cambiar a estado APROBADA.">
+    <div actions>
+      <button mat-stroked-button (click)="cargarPendientes()">
+        <mat-icon>refresh</mat-icon> Actualizar
+      </button>
+    </div>
+  </app-page-header>
+
+  <div class="alert-rn mb-3">
+    <mat-icon>verified</mat-icon>
+    <span><strong>Regla RN-03:</strong> Las citas creadas por un médico nacen en estado <em>PENDIENTE</em>. Solo el Administrador puede cambiarlas a <em>APROBADA</em> tras verificar la boleta o pago de la consulta en caja.</span>
+  </div>
+
+  <mat-card class="table-card">
+    <mat-card-content class="table-container">
+      <table mat-table [dataSource]="citas()" class="w-100">
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha</th>
+          <td mat-cell *matCellDef="let c">{{ c.fechaHoraInicio | date:'dd/MM/yyyy' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="hora">
+          <th mat-header-cell *matHeaderCellDef>Horario</th>
+          <td mat-cell *matCellDef="let c">{{ c.fechaHoraInicio | date:'HH:mm' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="paciente">
+          <th mat-header-cell *matHeaderCellDef>Paciente Pediátrico</th>
+          <td mat-cell *matCellDef="let c">
+            <strong>{{ c.paciente | nombreCompleto }}</strong> (HC: {{ c.paciente?.numeroHistoria }})
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="doctor">
+          <th mat-header-cell *matHeaderCellDef>Doctor Solicitante</th>
+          <td mat-cell *matCellDef="let c">{{ c.medico?.personal?.nombres }} {{ c.medico?.personal?.apellidoPaterno }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="motivo">
+          <th mat-header-cell *matHeaderCellDef>Motivo</th>
+          <td mat-cell *matCellDef="let c">{{ c.motivo }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="origen">
+          <th mat-header-cell *matHeaderCellDef>Origen</th>
+          <td mat-cell *matCellDef="let c">
+            <span class="badge-doctor">{{ c.origen }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones de Caja</th>
+          <td mat-cell *matCellDef="let c">
+            <div class="d-flex gap-2">
+              <button mat-raised-button color="primary" (click)="aprobarPago(c)">
+                <mat-icon>check</mat-icon> Confirmar Pago y Aprobar
+              </button>
+              <button mat-button color="warn" (click)="rechazarCita(c)">
+                Rechazar
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      @if (citas().length === 0) {
+        <app-empty-state
+          icon="check_circle"
+          title="No hay citas pendientes de pago"
+          description="Todas las citas programadas cuentan con comprobante verificado.">
+        </app-empty-state>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

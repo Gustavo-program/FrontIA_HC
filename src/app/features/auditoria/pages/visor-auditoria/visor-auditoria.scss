@@ -1,0 +1,23 @@
+.auditoria-page {
+  .table-card, .detail-card {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .action-tag {
+    background: #e2e8f0;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #1e293b;
+  }
+  .json-box {
+    background: #1e293b;
+    color: #38bdf8;
+    padding: 16px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 13px;
+    overflow-x: auto;
+  }
+}

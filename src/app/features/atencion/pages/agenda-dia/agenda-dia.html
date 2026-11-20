@@ -1,0 +1,181 @@
+<div class="agenda-page">
+  <app-page-header
+    title="Atención Médica Pediátrica"
+    subtitle="Agenda de citas programadas y atención directa a pacientes del INSN">
+    <div actions class="d-flex gap-2">
+      <button mat-raised-button color="accent" (click)="abrirNuevaCita()">
+        <mat-icon>add_alarm</mat-icon> Agendar Cita de Control
+      </button>
+      <button mat-stroked-button (click)="cargarAgenda(); cargarPacientes()">
+        <mat-icon>refresh</mat-icon> Refrescar
+      </button>
+    </div>
+  </app-page-header>
+
+  <mat-tab-group class="agenda-tabs mt-2">
+    <!-- PESTAÑA 1: AGENDA DE CITAS DEL DÍA -->
+    <mat-tab label="Agenda de Citas del Día">
+      <div class="p-3">
+        <mat-card class="filter-card">
+          <mat-card-content class="d-flex gap-3 align-center flex-wrap">
+            <mat-form-field appearance="outline" style="min-width: 220px;">
+              <mat-label>Fecha de Consulta</mat-label>
+              <input matInput [matDatepicker]="pickerFechaAgenda" [ngModel]="fechaSeleccionada()" (ngModelChange)="fechaSeleccionada.set($event); cargarAgenda()" placeholder="DD/MM/AAAA">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerFechaAgenda"></mat-datepicker-toggle>
+              <mat-datepicker #pickerFechaAgenda></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-grow-1">
+              <mat-label>Filtrar por Paciente, DNI o N° HC</mat-label>
+              <input matInput [(ngModel)]="busqueda" placeholder="Buscar en la agenda del día...">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="table-card mt-3">
+          <mat-card-content class="table-container">
+            <table mat-table [dataSource]="citasFiltradas()" class="w-100">
+              <!-- Hora -->
+              <ng-container matColumnDef="hora">
+                <th mat-header-cell *matHeaderCellDef>Horario</th>
+                <td mat-cell *matCellDef="let c" class="hora-cell">
+                  <mat-icon class="clock-icon">schedule</mat-icon>
+                  <span>{{ c.fechaHoraInicio | date:'HH:mm' }} - {{ c.fechaHoraFin | date:'HH:mm' }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Paciente -->
+              <ng-container matColumnDef="paciente">
+                <th mat-header-cell *matHeaderCellDef>Paciente Pediátrico</th>
+                <td mat-cell *matCellDef="let c">
+                  <span class="paciente-nombre font-weight-bold">{{ c.paciente | nombreCompleto }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Historia -->
+              <ng-container matColumnDef="historia">
+                <th mat-header-cell *matHeaderCellDef>N° HC</th>
+                <td mat-cell *matCellDef="let c">
+                  <span class="hc-badge">{{ c.paciente?.numeroHistoria }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Edad -->
+              <ng-container matColumnDef="edad">
+                <th mat-header-cell *matHeaderCellDef>Edad</th>
+                <td mat-cell *matCellDef="let c">{{ c.paciente?.fechaNacimiento | edad }}</td>
+              </ng-container>
+
+              <!-- Motivo -->
+              <ng-container matColumnDef="motivo">
+                <th mat-header-cell *matHeaderCellDef>Motivo</th>
+                <td mat-cell *matCellDef="let c">{{ c.motivo }}</td>
+              </ng-container>
+
+              <!-- Estado -->
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let c">
+                  <app-status-chip [status]="c.estado"></app-status-chip>
+                </td>
+              </ng-container>
+
+              <!-- Acciones -->
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acción</th>
+                <td mat-cell *matCellDef="let c">
+                  <button mat-raised-button color="primary" (click)="atender(c)">
+                    <mat-icon>medical_services</mat-icon> Atender Consulta
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+
+            @if (citasFiltradas().length === 0) {
+              <app-empty-state
+                icon="event_busy"
+                title="Sin citas en este horario o filtro"
+                description="No se registran citas médicas que coincidan con la fecha o el criterio de búsqueda.">
+              </app-empty-state>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- PESTAÑA 2: PACIENTES DEL HOSPITAL / ATENCIÓN DIRECTA -->
+    <mat-tab label="Pacientes Registrados del Hospital (Atención Directa)">
+      <div class="p-3">
+        <mat-card class="filter-card">
+          <mat-card-content class="d-flex gap-3 align-center">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Buscar Paciente por Nombre, Apellidos, DNI o N° HC (7 dígitos)</mat-label>
+              <input matInput [(ngModel)]="busquedaPacientes" placeholder="Escriba para filtrar todos los pacientes registrados en el hospital...">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="table-card mt-3">
+          <mat-card-content class="table-container">
+            <table mat-table [dataSource]="pacientesFiltrados()" class="w-100">
+              <ng-container matColumnDef="historia">
+                <th mat-header-cell *matHeaderCellDef>N° HC</th>
+                <td mat-cell *matCellDef="let p">
+                  <span class="hc-badge">{{ p.numeroHistoria }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="nombres">
+                <th mat-header-cell *matHeaderCellDef>Paciente Pediátrico</th>
+                <td mat-cell *matCellDef="let p">
+                  <strong>{{ p | nombreCompleto }}</strong>
+                  <span class="d-block text-muted" style="font-size: 11px;">Sexo: {{ p.sexoRegistrado }} | Origen: {{ p.lugarNacimiento }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="documento">
+                <th mat-header-cell *matHeaderCellDef>DNI</th>
+                <td mat-cell *matCellDef="let p">{{ p.documentoPrincipal?.numeroDocumento }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="edad">
+                <th mat-header-cell *matHeaderCellDef>Edad</th>
+                <td mat-cell *matCellDef="let p">{{ p.fechaNacimiento | edad }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones del Doctor</th>
+                <td mat-cell *matCellDef="let p">
+                  <div class="d-flex align-center gap-2">
+                    <button mat-raised-button color="primary" (click)="atenderPacienteDirecto(p)" title="Iniciar atención clínica inmediata">
+                      <mat-icon>medical_services</mat-icon> Atender Consulta
+                    </button>
+                    <a mat-stroked-button [routerLink]="['/historias', p.numeroHistoria]" title="Ver Historia Clínica">
+                      <mat-icon>folder_shared</mat-icon> Ver HC
+                    </a>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="pacColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: pacColumns;"></tr>
+            </table>
+
+            @if (pacientesFiltrados().length === 0) {
+              <app-empty-state
+                icon="person_search"
+                title="No se encontraron pacientes"
+                description="No hay pacientes que coincidan con el término de búsqueda ingresado.">
+              </app-empty-state>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

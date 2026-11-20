@@ -1,0 +1,113 @@
+<div class="reportes-page">
+  <app-page-header
+    title="Reportes Estadísticos Asistenciales"
+    subtitle="Métricas de producción médica, atenciones mensuales y patologías más frecuentes (CIE-10)">
+    <div actions class="d-flex gap-2">
+      <button mat-raised-button color="primary" (click)="exportar('pdf')">
+        <mat-icon>picture_as_pdf</mat-icon> Exportar PDF
+      </button>
+      <button mat-raised-button color="accent" (click)="exportar('xlsx')">
+        <mat-icon>table_view</mat-icon> Exportar Excel
+      </button>
+    </div>
+  </app-page-header>
+
+  <!-- Tarjetas de Resumen -->
+  <div class="kpi-grid">
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-icon bg-blue"><mat-icon>medical_services</mat-icon></div>
+        <div>
+          <span class="kpi-val">{{ stats().totalAtenciones }}</span>
+          <span class="kpi-sub">Total Atenciones Clínicas</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-icon bg-green"><mat-icon>child_care</mat-icon></div>
+        <div>
+          <span class="kpi-val">{{ stats().totalPacientes }}</span>
+          <span class="kpi-sub">Pacientes Pediátricos Atendidos</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-icon bg-amber"><mat-icon>trending_up</mat-icon></div>
+        <div>
+          <span class="kpi-val">+14%</span>
+          <span class="kpi-sub">Crecimiento Respecto al Mes Anterior</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Gráfico de Barras Mensual -->
+  <mat-card class="chart-card mt-4">
+    <mat-card-header>
+      <mat-card-title>Evolución de Atenciones por Mes (Último Semestre)</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="mt-3">
+      <div class="bar-chart-container">
+        @for (item of stats().atencionesPorMes; track item.mes) {
+          <div class="bar-col">
+            <span class="bar-val">{{ item.cantidad }}</span>
+            <div class="bar" [style.height.%]="(item.cantidad / 35) * 100"></div>
+            <span class="bar-label">{{ item.mes }}</span>
+          </div>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tabla de Diagnósticos Top 10 CIE-10 -->
+  <mat-card class="table-card mt-4">
+    <mat-card-header>
+      <mat-card-title>Diagnósticos Más Frecuentes en Consulta Externa (Top CIE-10)</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="table-container mt-2">
+      <table mat-table [dataSource]="stats().topDiagnosticos" class="w-100">
+        <ng-container matColumnDef="posicion">
+          <th mat-header-cell *matHeaderCellDef>#</th>
+          <td mat-cell *matCellDef="let row; let i = index">
+            <span class="pos-badge">{{ i + 1 }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="codigo">
+          <th mat-header-cell *matHeaderCellDef>Código CIE-10</th>
+          <td mat-cell *matCellDef="let row">
+            <strong class="text-info">{{ row.codigo }}</strong>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="descripcion">
+          <th mat-header-cell *matHeaderCellDef>Descripción de la Patología</th>
+          <td mat-cell *matCellDef="let row">{{ row.descripcion }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="cantidad">
+          <th mat-header-cell *matHeaderCellDef>Casos</th>
+          <td mat-cell *matCellDef="let row">
+            <strong>{{ row.cantidad }}</strong>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="barra">
+          <th mat-header-cell *matHeaderCellDef>Proporción</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="prop-bar-container">
+              <div class="prop-bar" [style.width.%]="(row.cantidad / 40) * 100"></div>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

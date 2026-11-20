@@ -1,0 +1,34 @@
+.agenda-page {
+  .filter-card {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .table-card {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+
+    .hora-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: #005cb2;
+      .clock-icon { font-size: 16px; width: 16px; height: 16px; }
+    }
+
+    .paciente-nombre {
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .hc-badge {
+      background: #e2e8f0;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+    }
+  }
+}

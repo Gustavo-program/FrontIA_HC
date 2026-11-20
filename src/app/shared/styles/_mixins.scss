@@ -1,0 +1,100 @@
+// ============================================================
+// HC-INSN Mixins
+// ============================================================
+@use 'variables' as v;
+
+// Responsive breakpoints
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == 'sm' {
+    @media (max-width: v.$breakpoint-sm) { @content; }
+  } @else if $breakpoint == 'md' {
+    @media (max-width: v.$breakpoint-md) { @content; }
+  } @else if $breakpoint == 'lg' {
+    @media (max-width: v.$breakpoint-lg) { @content; }
+  } @else if $breakpoint == 'xl' {
+    @media (max-width: v.$breakpoint-xl) { @content; }
+  }
+}
+
+@mixin respond-above($breakpoint) {
+  @if $breakpoint == 'sm' {
+    @media (min-width: v.$breakpoint-sm) { @content; }
+  } @else if $breakpoint == 'md' {
+    @media (min-width: v.$breakpoint-md) { @content; }
+  } @else if $breakpoint == 'lg' {
+    @media (min-width: v.$breakpoint-lg) { @content; }
+  } @else if $breakpoint == 'xl' {
+    @media (min-width: v.$breakpoint-xl) { @content; }
+  }
+}
+
+// Flexbox helpers
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Truncate text
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Card styles
+@mixin card-elevated {
+  background: white;
+  border-radius: v.$radius-md;
+  box-shadow: v.$shadow-md;
+}
+
+// Scrollbar
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
+// Page container
+@mixin page-container {
+  max-width: v.$content-max-width;
+  margin: 0 auto;
+  padding: v.$spacing-lg;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// Error/status page
+@mixin status-page {
+  @include flex-center;
+  @include flex-column;
+  min-height: 60vh;
+  text-align: center;
+  gap: v.$spacing-lg;
+}

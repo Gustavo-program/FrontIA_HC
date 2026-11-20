@@ -1,0 +1,18 @@
+<mat-form-field appearance="outline" class="w-100">
+  <mat-label>Buscar Paciente (Nombres, DNI o N° HC)</mat-label>
+  <input matInput [formControl]="searchControl" [matAutocomplete]="auto" (focus)="onFocus()" placeholder="Ej. Juan Pérez, 72481920 o 2026009">
+  <mat-icon matSuffix>search</mat-icon>
+  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onSelect($event)">
+    @for (p of pacientes; track p.pacienteId) {
+      <mat-option [value]="p">
+        <div class="paciente-option">
+          <span class="nombre">{{ p | nombreCompleto }}</span>
+          <span class="meta">Doc: {{ p.documentoPrincipal?.numeroDocumento || 'S/D' }} | HC: {{ p.numeroHistoria || 'Nueva' }}</span>
+        </div>
+      </mat-option>
+    }
+    @if (loading) {
+      <mat-option disabled>Buscando pacientes...</mat-option>
+    }
+  </mat-autocomplete>
+</mat-form-field>

@@ -1,0 +1,40 @@
+// ============================================================
+// HC-INSN Theme Customizations
+// ============================================================
+@use '@angular/material' as mat;
+@use 'variables' as v;
+
+// Custom density adjustments for compact layouts
+@mixin compact-density {
+  @include mat.form-field-density(-1);
+  @include mat.table-density(-1);
+}
+
+// Custom component overrides
+@mixin component-overrides {
+  // Dialog customization
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-shape: #{v.$radius-lg};
+  }
+
+  // Snackbar customization
+  .mat-mdc-snack-bar-container {
+    --mdc-snackbar-container-shape: #{v.$radius-md};
+  }
+
+  // Table customization
+  .mat-mdc-table {
+    .mat-mdc-header-row {
+      background-color: var(--mat-sys-surface-container);
+    }
+  }
+
+  // Toolbar overrides
+  .mat-toolbar {
+    &.app-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+  }
+}

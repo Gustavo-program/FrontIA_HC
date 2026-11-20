@@ -1,0 +1,118 @@
+<div class="horarios-page">
+  <app-page-header
+    title="Gestión de Horarios y Turnos Médicos (RR. HH.)"
+    subtitle="Programación de turnos de 6 horas y generación automática de cupos (RN-01, RN-12)">
+  </app-page-header>
+
+  <!-- Formulario de Creación / Edición de Turno de 6 Horas -->
+  <mat-card class="form-card mb-4">
+    <mat-card-header>
+      <mat-card-title>{{ modoEdicion() ? 'Editar Turno Médico' : 'Programar Turno Médico' }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="mt-2">
+      <div class="alert-info-box mb-3">
+        <mat-icon>info</mat-icon>
+        <span>Regla RN-01: Al definir la hora de inicio, el sistema calcula automáticamente la hora de fin (+6 horas) y genera 12 cupos de atención de 30 minutos cada uno.</span>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="guardarTurno()" class="d-flex gap-3 align-center flex-wrap">
+        <mat-form-field appearance="outline" class="flex-grow-1" style="min-width: 260px;">
+          <mat-label>Médico Especialista</mat-label>
+          <mat-select formControlName="medicoId">
+            @for (m of medicos(); track m.medicoId) {
+              <mat-option [value]="m.medicoId">Dr(a). {{ m.personal.nombres }} {{ m.personal.apellidoPaterno }} (CMP: {{ m.numeroCmp }})</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="min-width: 200px;">
+          <mat-label>Fecha del Turno</mat-label>
+          <input matInput [matDatepicker]="pickerTurno" formControlName="fecha" placeholder="DD/MM/AAAA">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerTurno"></mat-datepicker-toggle>
+          <mat-datepicker #pickerTurno></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 140px;">
+          <mat-label>Hora de Inicio</mat-label>
+          <input matInput type="time" formControlName="horaInicio">
+        </mat-form-field>
+
+        <div class="d-flex gap-2" style="margin-bottom: 22px;">
+          @if (modoEdicion()) {
+            <button mat-stroked-button type="button" (click)="cancelarEdicion()" style="height: 54px;">
+              Cancelar
+            </button>
+          }
+          <button mat-raised-button color="primary" type="submit" [disabled]="guardando()" style="height: 54px;">
+            <mat-icon>{{ modoEdicion() ? 'save' : 'add' }}</mat-icon>
+            {{ modoEdicion() ? 'Guardar Cambios' : 'Generar Turno (6h / 12 Cupos)' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tabla de Turnos Programados -->
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-card-title>Turnos Médicos Programados (RR. HH.)</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="table-container">
+      <table mat-table [dataSource]="horarios()" class="w-100">
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha</th>
+          <td mat-cell *matCellDef="let h">{{ h.fecha | date:'dd/MM/yyyy' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="doctor">
+          <th mat-header-cell *matHeaderCellDef>Médico</th>
+          <td mat-cell *matCellDef="let h">
+            <strong>{{ h.medicoNombre || 'Médico Asistencial' }}</strong>
+            <span class="d-block text-muted" style="font-size: 11px;">{{ h.especialidadNombre || h.servicioNombre }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="inicio">
+          <th mat-header-cell *matHeaderCellDef>Hora Inicio</th>
+          <td mat-cell *matCellDef="let h">{{ h.horaInicio }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="fin">
+          <th mat-header-cell *matHeaderCellDef>Hora Fin (+6h)</th>
+          <td mat-cell *matCellDef="let h">{{ h.horaFin }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="cupos">
+          <th mat-header-cell *matHeaderCellDef>Cupos Totales / Libres</th>
+          <td mat-cell *matCellDef="let h">
+            <span class="cupos-badge">12 cupos ({{ h.cuposLibres ?? 12 }} libres)</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let h">
+            <app-status-chip [status]="h.estado"></app-status-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let h">
+            <div class="d-flex align-center gap-1">
+              <button mat-icon-button color="primary" (click)="editarTurno(h)" title="Editar turno">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="eliminarTurno(h)" title="Eliminar turno">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

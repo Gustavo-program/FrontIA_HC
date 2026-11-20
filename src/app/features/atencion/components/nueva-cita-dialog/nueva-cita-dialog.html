@@ -1,0 +1,46 @@
+<h2 mat-dialog-title>
+  <mat-icon color="primary">schedule</mat-icon>
+  Agendar Nueva Cita de Control
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <div class="alert-rn">
+    <mat-icon>info</mat-icon>
+    <span>Como médico, solo puede agendar citas en sus <strong>propios cupos libres</strong> (RN-02). La cita nacerá en estado <strong>PENDIENTE</strong> hasta que Administración valide el pago (RN-03).</span>
+  </div>
+
+  <app-paciente-search (pacienteSelected)="seleccionarPaciente($event)"></app-paciente-search>
+
+  @if (pacienteSeleccionado()) {
+    <div class="selected-pac-box">
+      <span>Paciente: <strong>{{ pacienteSeleccionado()?.nombres }} {{ pacienteSeleccionado()?.apellidoPaterno }}</strong></span>
+      <span>HC: {{ pacienteSeleccionado()?.numeroHistoria }}</span>
+    </div>
+  }
+
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline" class="w-100 mt-2">
+      <mat-label>Fecha de la Cita</mat-label>
+      <input matInput type="date" formControlName="fecha">
+    </mat-form-field>
+
+    <label class="cupos-label">Seleccione Cupo Disponible (30 min):</label>
+    <app-cupo-selector
+      [cupos]="cupos()"
+      [cupoSeleccionado]="cupoSeleccionado()"
+      (cupoChange)="seleccionarCupo($event)">
+    </app-cupo-selector>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Motivo de la Cita de Control</mat-label>
+      <textarea matInput formControlName="motivo" rows="2" placeholder="Ej. Control de evolución post tratamiento antibiótico"></textarea>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="primary" (click)="guardar()" [disabled]="guardando()">
+    Registrar Cita (Pendiente)
+  </button>
+</mat-dialog-actions>

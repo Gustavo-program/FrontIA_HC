@@ -1,0 +1,71 @@
+<div class="detalle-page">
+  <app-page-header
+    [title]="'Validación de Historia Clínica: ' + (revision()?.documento?.nombreArchivoOriginal || '')"
+    subtitle="Contraste el documento escaneado original frente a los campos extraídos automáticamente por IA">
+    <div actions>
+      <button mat-button (click)="devolver()" color="warn" [disabled]="guardando()">
+        <mat-icon>undo</mat-icon> Devolver / Rechazar
+      </button>
+      <button mat-raised-button color="primary" (click)="autorizar()" [disabled]="guardando()">
+        <mat-icon>check_circle</mat-icon> Autorizar Documento
+      </button>
+    </div>
+  </app-page-header>
+
+  <!-- Vista Dividida (Split View) -->
+  <div class="split-container">
+    <!-- Panel Izquierdo: Visor de PDF Original -->
+    <div class="panel-pdf">
+      <div class="panel-header">
+        <mat-icon>picture_as_pdf</mat-icon>
+        <h3>Expediente Físico Escaneado</h3>
+      </div>
+      <app-pdf-viewer [url]="pdfUrl()" height="720px"></app-pdf-viewer>
+    </div>
+
+    <!-- Panel Derecho: Campos Extraídos por IA y Edición -->
+    <div class="panel-form">
+      <div class="panel-header">
+        <mat-icon>fact_check</mat-icon>
+        <h3>Campos Extraídos por IA (Confiabilidad: {{ revision()?.confiabilidadPromedio }}%)</h3>
+      </div>
+
+      <div class="alert-info-box">
+        <mat-icon>info</mat-icon>
+        <span>Revise cada campo. Si algún dato no se puede leer en el documento físico, use el botón <strong>«Ilegible»</strong> que colocará «-» (Regla RN-08).</span>
+      </div>
+
+      <div class="fields-list">
+        @for (campo of campos(); track campo.nombreCampo) {
+          <div class="field-item" [class.field-warning]="campo.confianza < 0.85">
+            <div class="field-header">
+              <span class="field-label">{{ campo.etiqueta || campo.nombreCampo }}</span>
+              <div class="field-badges">
+                <app-confidence-badge [confidence]="campo.confianza"></app-confidence-badge>
+                <button type="button" mat-stroked-button color="warn" class="btn-ilegit" (click)="marcarIlegible(campo)">
+                  Ilegible (-)
+                </button>
+              </div>
+            </div>
+
+            @if (esCampoExtenso(campo)) {
+              <mat-form-field appearance="outline" class="w-100">
+                <textarea
+                  matInput
+                  [(ngModel)]="campo.valorCorregido"
+                  [placeholder]="campo.valorExtraido"
+                  rows="4"
+                  class="custom-textarea">
+                </textarea>
+              </mat-form-field>
+            } @else {
+              <mat-form-field appearance="outline" class="w-100">
+                <input matInput [(ngModel)]="campo.valorCorregido" [placeholder]="campo.valorExtraido">
+              </mat-form-field>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

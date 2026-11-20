@@ -1,0 +1,76 @@
+<div class="auditoria-page">
+  <app-page-header
+    title="Auditoría y Trazabilidad del Sistema (RF-AUD)"
+    subtitle="Registro inmutable de acciones, transacciones de escritura y correlación de peticiones (RN-13, RNF-11)">
+    <div actions>
+      <button mat-stroked-button (click)="cargarAuditoria()">
+        <mat-icon>refresh</mat-icon> Actualizar Registro
+      </button>
+    </div>
+  </app-page-header>
+
+  <mat-card class="table-card">
+    <mat-card-content class="table-container">
+      <table mat-table [dataSource]="eventos()" class="w-100">
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha y Hora</th>
+          <td mat-cell *matCellDef="let ev">{{ ev.fechaEvento | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="usuario">
+          <th mat-header-cell *matHeaderCellDef>Usuario</th>
+          <td mat-cell *matCellDef="let ev">
+            <strong>{{ ev.nombreUsuario || 'Sistema' }}</strong>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="accion">
+          <th mat-header-cell *matHeaderCellDef>Acción</th>
+          <td mat-cell *matCellDef="let ev">
+            <span class="action-tag">{{ ev.accion }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="recurso">
+          <th mat-header-cell *matHeaderCellDef>Recurso</th>
+          <td mat-cell *matCellDef="let ev">{{ ev.tipoRecurso }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="resultado">
+          <th mat-header-cell *matHeaderCellDef>Resultado</th>
+          <td mat-cell *matCellDef="let ev">
+            <app-status-chip [status]="ev.resultado"></app-status-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="ip">
+          <th mat-header-cell *matHeaderCellDef>IP Origen</th>
+          <td mat-cell *matCellDef="let ev">{{ ev.ipOrigen || '127.0.0.1' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="detalles">
+          <th mat-header-cell *matHeaderCellDef>Correlation-ID / JSON</th>
+          <td mat-cell *matCellDef="let ev">
+            <button mat-button color="primary" (click)="verDetalles(ev)">Ver Detalles</button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+  @if (eventoSeleccionado) {
+    <mat-card class="detail-card mt-4">
+      <mat-card-header class="d-flex justify-between align-center">
+        <mat-card-title>Detalles del Evento de Auditoría (ID: {{ eventoSeleccionado.auditoriaId }})</mat-card-title>
+        <button mat-icon-button (click)="eventoSeleccionado = null"><mat-icon>close</mat-icon></button>
+      </mat-card-header>
+      <mat-card-content class="mt-2">
+        <p><strong>Correlation-ID (RNF-11):</strong> {{ eventoSeleccionado.correlationId || 'insn-auto-track' }}</p>
+        <pre class="json-box">{{ eventoSeleccionado.detalles | json }}</pre>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

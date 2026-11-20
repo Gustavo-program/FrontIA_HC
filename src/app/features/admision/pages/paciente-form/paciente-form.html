@@ -1,0 +1,166 @@
+<div class="paciente-form-page">
+  <app-page-header
+    title="Registro de Paciente Pediátrico"
+    subtitle="Apertura de ficha clínica y generación automática de Historia Clínica (INSN)">
+  </app-page-header>
+
+  <mat-card class="stepper-card">
+    <mat-stepper linear #stepper>
+      <!-- PASO 1: DATOS PERSONALES -->
+      <mat-step [stepControl]="formPersonales" label="Datos Personales">
+        <form [formGroup]="formPersonales" class="step-form">
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombres del Niño(a)</mat-label>
+              <input matInput formControlName="nombres" placeholder="Ej. Mateo Sebastián">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Apellido Paterno</mat-label>
+              <input matInput formControlName="apellidoPaterno">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Apellido Materno</mat-label>
+              <input matInput formControlName="apellidoMaterno">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha de Nacimiento (No futura)</mat-label>
+              <input matInput [matDatepicker]="pickerNac" formControlName="fechaNacimiento" placeholder="DD/MM/AAAA">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerNac"></mat-datepicker-toggle>
+              <mat-datepicker #pickerNac></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Sexo Registrado</mat-label>
+              <mat-select formControlName="sexoRegistrado">
+                <mat-option value="MASCULINO">Masculino</mat-option>
+                <mat-option value="FEMENINO">Femenino</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Lugar de Nacimiento</mat-label>
+              <input matInput formControlName="lugarNacimiento" placeholder="Ej. Lima - Breña">
+            </mat-form-field>
+          </div>
+
+          <div class="step-actions">
+            <button mat-raised-button color="primary" matStepperNext>Siguiente: Identificación</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- PASO 2: DOCUMENTO DE IDENTIDAD -->
+      <mat-step [stepControl]="formDocumento" label="Documento de Identidad">
+        <form [formGroup]="formDocumento" class="step-form">
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Documento</mat-label>
+              <mat-select formControlName="tipoDocumentoId">
+                @for (td of tiposDocumento(); track td.tipoDocumentoIdentidadId) {
+                  <mat-option [value]="td.tipoDocumentoIdentidadId">{{ td.descripcion }} ({{ td.abreviatura }})</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Número de Documento</mat-label>
+              <input matInput formControlName="numeroDocumento" placeholder="8 dígitos para DNI">
+            </mat-form-field>
+          </div>
+
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>Atrás</button>
+            <button mat-raised-button color="primary" matStepperNext>Siguiente: Familiar Responsable</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- PASO 3: FAMILIAR RESPONSABLE -->
+      <mat-step [stepControl]="formResponsable" label="Familiar Responsable (Padre/Tutor)">
+        <form [formGroup]="formResponsable" class="step-form">
+          <div class="alert-info-box mb-3">
+            <mat-icon>family_restroom</mat-icon>
+            <span>Al ser pacientes pediátricos, los datos de contacto (WhatsApp y Correo) pertenecerán al responsable principal para el envío de recetas y citas (RN-10).</span>
+          </div>
+
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombres del Responsable</mat-label>
+              <input matInput formControlName="nombres">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Apellido Paterno</mat-label>
+              <input matInput formControlName="apellidoPaterno">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Parentesco</mat-label>
+              <mat-select formControlName="parentesco">
+                <mat-option value="Madre">Madre</mat-option>
+                <mat-option value="Padre">Padre</mat-option>
+                <mat-option value="Tutor Legal">Tutor Legal</mat-option>
+                <mat-option value="Abuelo(a)">Abuelo(a)</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>DNI del Responsable</mat-label>
+              <input matInput formControlName="numeroDocumento">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Teléfono Celular / WhatsApp</mat-label>
+              <input matInput formControlName="telefonoWhatsapp" placeholder="Ej. 998765432">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Correo Electrónico</mat-label>
+              <input matInput type="email" formControlName="correo" placeholder="correo@ejemplo.com">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="col-span-2">
+              <mat-label>Dirección Domiciliaria</mat-label>
+              <input matInput formControlName="direccion" placeholder="Calle, Avenida, Jr., Distrito...">
+            </mat-form-field>
+          </div>
+
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>Atrás</button>
+            <button mat-raised-button color="primary" matStepperNext>Revisar y Confirmar</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- PASO 4: CONFIRMACIÓN Y APERTURA DE HC -->
+      <mat-step label="Confirmación y HC">
+        <div class="step-form">
+          <div class="summary-box">
+            <h3>Resumen de Admisión</h3>
+            <p><strong>Paciente:</strong> {{ formPersonales.get('nombres')?.value }} {{ formPersonales.get('apellidoPaterno')?.value }}</p>
+            <p><strong>Documento:</strong> {{ formDocumento.get('numeroDocumento')?.value }}</p>
+            <p><strong>Familiar Responsable:</strong> {{ formResponsable.get('nombres')?.value }} ({{ formResponsable.get('parentesco')?.value }})</p>
+            <p><strong>Contacto de Envío:</strong> {{ formResponsable.get('telefonoWhatsapp')?.value }} | {{ formResponsable.get('correo')?.value }}</p>
+            <div class="hc-preview">
+              <mat-icon color="primary">assignment</mat-icon>
+              <span>Se creará automáticamente la Historia Clínica Digital en el INSN Breña (RN-07).</span>
+            </div>
+          </div>
+
+          <div class="step-actions d-flex gap-2 flex-wrap">
+            <button mat-button matStepperPrevious>Atrás</button>
+            <button mat-stroked-button color="primary" (click)="guardarPaciente(false)" [disabled]="guardando()">
+              <mat-icon>how_to_reg</mat-icon> Registrar y Volver al Directorio
+            </button>
+            <button mat-raised-button color="primary" (click)="guardarPaciente(true)" [disabled]="guardando()">
+              <mat-icon>event</mat-icon> Registrar y Programar Cita Inmediata
+            </button>
+          </div>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  </mat-card>
+</div>

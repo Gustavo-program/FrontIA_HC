@@ -1,0 +1,168 @@
+<div class="dashboard-container">
+  <app-page-header
+    [title]="'Bienvenido(a), ' + store.nombreCompleto()"
+    [subtitle]="'Instituto Nacional de Salud del Niño - Sistema de Historias Clínicas Electrónicas'">
+    <div actions class="badge-role">
+      <mat-icon>verified_user</mat-icon>
+      <span>Rol: {{ store.roles().join(', ') }}</span>
+    </div>
+  </app-page-header>
+
+  <!-- Tarjetas Informativas según Rol -->
+  @if (store.esAdmin()) {
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon bg-blue"><mat-icon>people</mat-icon></div>
+          <div class="stat-info">
+            <span class="stat-value">1,420</span>
+            <span class="stat-label">Pacientes Registrados</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon bg-green"><mat-icon>event_available</mat-icon></div>
+          <div class="stat-info">
+            <span class="stat-value">28</span>
+            <span class="stat-label">Citas Programadas Hoy</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon bg-amber"><mat-icon>pending_actions</mat-icon></div>
+          <div class="stat-info">
+            <span class="stat-value">1</span>
+            <span class="stat-label">Citas Pendientes de Pago</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon bg-purple"><mat-icon>document_scanner</mat-icon></div>
+          <div class="stat-info">
+            <span class="stat-value">1</span>
+            <span class="stat-label">HC por Validar (IA < 85%)</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+
+  <!-- Accesos Rápidos del Módulo -->
+  <h2 class="section-title">Módulos Asignados</h2>
+  <div class="modules-grid">
+    @if (store.esAdmin() || store.esDigitalizador()) {
+      <mat-card class="module-card" routerLink="/digitalizacion">
+        <mat-card-content>
+          <div class="mod-header">
+            <mat-icon class="mod-icon">document_scanner</mat-icon>
+            <h3>Digitalización con IA</h3>
+          </div>
+          <p>Cargue Historias Clínicas en PDF para escaneo OCR con Inteligencia Artificial.</p>
+          <span class="action-link">Ir a Digitalización →</span>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="module-card" routerLink="/validacion">
+        <mat-card-content>
+          <div class="mod-header">
+            <mat-icon class="mod-icon">fact_check</mat-icon>
+            <h3>Validación de HC</h3>
+          </div>
+          <p>Bandeja de documentos cuya lectura IA es menor al 85% para autorización manual.</p>
+          <span class="action-link">Revisar Bandeja →</span>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (store.esAdmin() || store.esDoctor()) {
+      <mat-card class="module-card" routerLink="/atencion">
+        <mat-card-content>
+          <div class="mod-header">
+            <mat-icon class="mod-icon">medical_services</mat-icon>
+            <h3>Atención Médica</h3>
+          </div>
+          <p>Agenda médica del día, consulta clínica, diagnóstico CIE-10 y receta electrónica.</p>
+          <span class="action-link">Ver Agenda de Hoy →</span>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="module-card" routerLink="/reportes">
+        <mat-card-content>
+          <div class="mod-header">
+            <mat-icon class="mod-icon">bar_chart</mat-icon>
+            <h3>Reportes Estadísticos</h3>
+          </div>
+          <p>Consulte indicadores asistenciales, gráficos mensuales y exportación a PDF/Excel.</p>
+          <span class="action-link">Ver Reportes →</span>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (store.esAdmin() || store.esAdmision()) {
+      <mat-card class="module-card" routerLink="/admision/pacientes">
+        <mat-card-content>
+          <div class="mod-header">
+            <mat-icon class="mod-icon">person_search</mat-icon>
+            <h3>Admisión de Pacientes</h3>
+          </div>
+          <p>Registro y edición de pacientes pediátricos, documentos y familiares responsables.</p>
+          <span class="action-link">Gestionar Pacientes →</span>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="module-card" routerLink="/admision/citas">
+        <mat-card-content>
+          <div class="mod-header">
+            <mat-icon class="mod-icon">event</mat-icon>
+            <h3>Programación de Citas</h3>
+          </div>
+          <p>Agende citas en cupos de 30 minutos disponibles de los médicos del hospital.</p>
+          <span class="action-link">Agendar Cita →</span>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (store.esAdmin() || store.esRRHH()) {
+      <mat-card class="module-card" routerLink="/horarios">
+        <mat-card-content>
+          <div class="mod-header">
+            <mat-icon class="mod-icon">schedule</mat-icon>
+            <h3>Horarios y Turnos</h3>
+          </div>
+          <p>Programación de turnos médicos de 6 horas y cálculo de cupos de atención.</p>
+          <span class="action-link">Administrar Turnos →</span>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (store.esAdmin()) {
+      <mat-card class="module-card" routerLink="/administracion/citas-pendientes">
+        <mat-card-content>
+          <div class="mod-header">
+            <mat-icon class="mod-icon">payments</mat-icon>
+            <h3>Citas Pendientes de Pago</h3>
+          </div>
+          <p>Aprobación de citas creadas por médicos una vez verificado el comprobante.</p>
+          <span class="action-link">Aprobar Pagos →</span>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="module-card" routerLink="/auditoria">
+        <mat-card-content>
+          <div class="mod-header">
+            <mat-icon class="mod-icon">security</mat-icon>
+            <h3>Auditoría del Sistema</h3>
+          </div>
+          <p>Registro de trazabilidad y eventos de seguridad con Correlation-ID.</p>
+          <span class="action-link">Ver Auditoría →</span>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+</div>

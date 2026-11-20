@@ -1,0 +1,5 @@
+<span class="confidence-badge" [class.high]="isHigh" [class.low]="!isHigh"
+      [matTooltip]="isHigh ? 'Confiabilidad alta (≥ 85%)' : 'Confiabilidad baja (< 85%) - Requiere revisión'">
+  <mat-icon class="icon">{{ isHigh ? 'check_circle' : 'warning' }}</mat-icon>
+  <span>{{ percentage }}%</span>
+</span>

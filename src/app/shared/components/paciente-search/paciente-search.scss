@@ -1,0 +1,13 @@
+.paciente-option {
+  display: flex;
+  flex-direction: column;
+
+  .nombre {
+    font-weight: 500;
+  }
+
+  .meta {
+    font-size: 11px;
+    color: #757575;
+  }
+}

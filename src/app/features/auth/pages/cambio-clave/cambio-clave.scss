@@ -1,0 +1,40 @@
+.cambio-box {
+  .icon-header {
+    text-align: center;
+    margin-bottom: 24px;
+    .lock-icon { font-size: 48px; width: 48px; height: 48px; color: #005cb2; }
+    h3 { margin: 8px 0 4px; font-size: 18px; color: #1e293b; }
+    p { margin: 0; font-size: 13px; color: #64748b; }
+  }
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .submit-btn {
+    height: 48px;
+    font-size: 15px;
+    font-weight: 600;
+    background-color: #005cb2 !important;
+    color: #ffffff !important;
+    flex: 1;
+
+    span, .mdc-button__label {
+      color: #ffffff !important;
+      font-weight: 600 !important;
+    }
+  }
+
+  .cancel-btn {
+    height: 48px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155 !important;
+    border-color: #cbd5e1 !important;
+
+    span, .mdc-button__label {
+      color: #334155 !important;
+      font-weight: 600 !important;
+    }
+  }
+}

@@ -1,0 +1,32 @@
+@use "variables" as *;
+
+@mixin mobile {
+  @media (max-width: 599px) { @content; }
+}
+
+@mixin tablet {
+  @media (min-width: 600px) and (max-width: 1024px) { @content; }
+}
+
+@mixin desktop {
+  @media (min-width: 1025px) { @content; }
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin card-box {
+  background: #ffffff;
+  border-radius: $border-radius-md;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12);
+  padding: $spacing-lg;
+}

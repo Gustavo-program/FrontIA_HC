@@ -1,0 +1,22 @@
+@use "variables" as *;
+
+.badge-ia {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #e3f2fd;
+  color: #0d47a1;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #bbdefb;
+  text-transform: uppercase;
+}
+
+.table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: $border-radius-md;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}

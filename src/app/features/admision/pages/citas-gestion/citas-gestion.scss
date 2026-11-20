@@ -1,0 +1,28 @@
+.citas-page {
+  .citas-tabs {
+    background: #ffffff;
+    border-radius: 12px;
+  }
+  .tab-padding { padding: 24px; }
+  .section-label { font-weight: 700; font-size: 13px; color: #005cb2; display: block; margin-bottom: 8px; }
+  .pac-alert { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 6px; font-size: 13px; margin-top: 8px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; @media (max-width: 768px) { grid-template-columns: 1fr; } }
+  .submit-box { display: flex; justify-content: flex-end; margin-top: 16px; }
+
+  .btn-aprobar-mini {
+    background-color: #16a34a !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    height: 30px !important;
+    padding: 0 10px !important;
+    border-radius: 6px !important;
+    line-height: 30px !important;
+
+    .mdc-button__label {
+      display: flex;
+      align-items: center;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+  }
+}

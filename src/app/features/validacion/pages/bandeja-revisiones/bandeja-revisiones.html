@@ -1,0 +1,80 @@
+<div class="bandeja-page">
+  <app-page-header
+    title="Bandeja de Validación de Historias Clínicas"
+    subtitle="Revisión manual y supervisión humana de documentos con confiabilidad IA inferior al 85%">
+    <div actions>
+      <button mat-stroked-button (click)="cargarRevisiones()">
+        <mat-icon>refresh</mat-icon> Actualizar
+      </button>
+    </div>
+  </app-page-header>
+
+  <mat-card class="table-card">
+    <mat-card-content class="table-container">
+      <table mat-table [dataSource]="revisiones()" class="w-100">
+        <!-- Documento -->
+        <ng-container matColumnDef="documento">
+          <th mat-header-cell *matHeaderCellDef>Documento Clínico</th>
+          <td mat-cell *matCellDef="let rev">
+            <div class="doc-cell">
+              <mat-icon color="warn">pending_actions</mat-icon>
+              <div>
+                <span class="doc-name">{{ rev.documento?.nombreArchivoOriginal }}</span>
+                <span class="doc-meta">Paciente: {{ rev.documento?.pacienteNombres || 'Identificación pendiente' }}</span>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Motivo -->
+        <ng-container matColumnDef="motivo">
+          <th mat-header-cell *matHeaderCellDef>Motivo de Revisión</th>
+          <td mat-cell *matCellDef="let rev">{{ rev.motivo }}</td>
+        </ng-container>
+
+        <!-- Confianza -->
+        <ng-container matColumnDef="confianza">
+          <th mat-header-cell *matHeaderCellDef>Confiabilidad IA</th>
+          <td mat-cell *matCellDef="let rev">
+            <app-confidence-badge [confidence]="rev.confiabilidadPromedio"></app-confidence-badge>
+          </td>
+        </ng-container>
+
+        <!-- Estado -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let rev">
+            <app-status-chip [status]="rev.estado"></app-status-chip>
+          </td>
+        </ng-container>
+
+        <!-- Fecha -->
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha Ingreso</th>
+          <td mat-cell *matCellDef="let rev">{{ rev.creadaEn | date:'dd/MM/yyyy HH:mm' }}</td>
+        </ng-container>
+
+        <!-- Acciones -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let rev">
+            <a mat-raised-button color="primary" [routerLink]="['/validacion', rev.revisionId]">
+              <mat-icon>edit_note</mat-icon> Revisar y Validar
+            </a>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      @if (revisiones().length === 0) {
+        <app-empty-state
+          icon="verified"
+          title="Bandeja de Validación al día"
+          description="No hay historias clínicas pendientes de validación manual en este momento.">
+        </app-empty-state>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

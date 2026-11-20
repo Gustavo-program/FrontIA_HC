@@ -1,0 +1,224 @@
+.historia-page {
+  .historia-tabs {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  .p-3 {
+    padding: 24px;
+  }
+
+  .info-card, .timeline-card, .pdf-card {
+    border-radius: 12px;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .label {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #64748b;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      .val {
+        font-size: 14px;
+        color: #1e293b;
+        font-weight: 500;
+
+        &.highlight {
+          font-size: 16px;
+          font-weight: 700;
+          color: #0284c7;
+        }
+      }
+    }
+  }
+
+  .status-badge-active {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 11px;
+    font-weight: 700;
+    width: fit-content;
+  }
+
+  .resp-box {
+    background: #f1f5f9;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #e2e8f0;
+
+    .resp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .doc-badge {
+        background: #e2e8f0;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    }
+
+    .resp-details p {
+      margin: 4px 0;
+      font-size: 13px;
+      color: #334155;
+    }
+  }
+
+  .timeline-card {
+    border-left: 5px solid #0284c7;
+    margin-bottom: 20px;
+  }
+
+  .service-chip {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .date-chip {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .medico-title {
+    margin: 6px 0 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .badge-ia {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f3e8ff;
+    color: #7e22ce;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .section-block {
+    .section-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .section-text {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #1e293b;
+    }
+
+    .findings-box {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      font-family: inherit;
+    }
+
+    .plan-box {
+      background: #f0fdf4;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      white-space: pre-line;
+    }
+  }
+
+  .diag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+
+    .cie-code {
+      background: #2563eb;
+      color: #ffffff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    .cie-desc {
+      color: #1e40af;
+      font-weight: 600;
+    }
+
+    .diag-type {
+      color: #64748b;
+      font-size: 11px;
+    }
+  }
+
+  .doc-item-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 8px 14px;
+    border-radius: 8px;
+
+    mat-icon {
+      color: #dc2626;
+    }
+
+    .doc-meta {
+      display: block;
+      font-size: 11px;
+      color: #64748b;
+    }
+  }
+}

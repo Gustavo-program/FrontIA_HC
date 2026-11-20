@@ -1,0 +1,20 @@
+<div class="cupo-grid">
+  @for (cupo of cupos; track cupo.horaInicio) {
+    <button type="button"
+            class="cupo-card"
+            [class.disponible]="cupo.disponible"
+            [class.ocupado]="!cupo.disponible"
+            [class.seleccionado]="isSelected(cupo)"
+            [disabled]="!cupo.disponible"
+            (click)="seleccionarCupo(cupo)"
+            [matTooltip]="cupo.disponible ? 'Disponible para agendar' : 'Ocupado por: ' + (cupo.pacienteNombre || 'Cita programada')">
+      <span class="hora">{{ cupo.horaInicio }} - {{ cupo.horaFin }}</span>
+      <span class="estado-text">
+        {{ cupo.disponible ? 'Libre' : 'Ocupado' }}
+      </span>
+    </button>
+  }
+  @if (cupos.length === 0) {
+    <p class="no-cupos">No hay cupos generados para este horario/fecha.</p>
+  }
+</div>

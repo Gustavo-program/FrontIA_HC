@@ -1,0 +1,241 @@
+<div class="usuarios-page">
+  <app-page-header
+    title="Gestión de Cuentas y Usuarios del Sistema (RF-ADMIN-01)"
+    subtitle="Administración centralizada de credenciales, roles institucionales y políticas de acceso al INSN">
+    <div actions class="d-flex gap-2">
+      <button mat-raised-button color="primary" (click)="abrirNuevo()">
+        <mat-icon>person_add</mat-icon> Nuevo Usuario
+      </button>
+      <button mat-stroked-button (click)="cargarUsuarios()">
+        <mat-icon>refresh</mat-icon> Actualizar
+      </button>
+    </div>
+  </app-page-header>
+
+  <!-- Formulario de Creación / Edición de Usuario -->
+  @if (formularioAbierto()) {
+    <mat-card class="form-card mb-4">
+      <mat-card-header class="d-flex justify-between align-center">
+        <mat-card-title class="d-flex align-center gap-2">
+          <mat-icon color="primary">{{ modoEdicion() ? 'manage_accounts' : 'person_add' }}</mat-icon>
+          {{ modoEdicion() ? 'Modificar Cuenta de Usuario: ' + usuarioSeleccionado()?.nombreUsuario : 'Registrar Nuevo Usuario del Sistema' }}
+        </mat-card-title>
+        <button mat-icon-button (click)="cerrarFormulario()"><mat-icon>close</mat-icon></button>
+      </mat-card-header>
+
+      <mat-card-content class="mt-3">
+        <form [formGroup]="form" class="form-grid">
+          <!-- Nombre de Usuario -->
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre de Usuario (Login)</mat-label>
+            <input matInput formControlName="nombreUsuario" placeholder="Ej. doc.sanchez o adm.valdez">
+            <mat-icon matPrefix class="mr-2">account_circle</mat-icon>
+            @if (form.get('nombreUsuario')?.hasError('required') && form.get('nombreUsuario')?.touched) {
+              <mat-error>El nombre de usuario es obligatorio</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Nombre Completo -->
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre y Apellidos Completos</mat-label>
+            <input matInput formControlName="nombreCompleto" placeholder="Ej. Dr. Carlos Sánchez Mendoza">
+            <mat-icon matPrefix class="mr-2">badge</mat-icon>
+            @if (form.get('nombreCompleto')?.hasError('required') && form.get('nombreCompleto')?.touched) {
+              <mat-error>El nombre completo es requerido</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Correo Institucional -->
+          <mat-form-field appearance="outline">
+            <mat-label>Correo Institucional</mat-label>
+            <input matInput type="email" formControlName="correo" placeholder="csanchez@insn.gob.pe">
+            <mat-icon matPrefix class="mr-2">mail</mat-icon>
+            @if (form.get('correo')?.hasError('required') && form.get('correo')?.touched) {
+              <mat-error>El correo institucional es obligatorio</mat-error>
+            }
+            @if (form.get('correo')?.hasError('email') && form.get('correo')?.touched) {
+              <mat-error>Ingrese un correo electrónico válido</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Rol Asignado -->
+          <mat-form-field appearance="outline">
+            <mat-label>Rol Institucional</mat-label>
+            <mat-select formControlName="rolCodigo">
+              <mat-option value="ADMIN">Administrador General</mat-option>
+              <mat-option value="DOCTOR">Médico Asistencial (Pediatra/Especialista)</mat-option>
+              <mat-option value="DIGITALIZADOR">Personal de Archivo / Digitalizador</mat-option>
+              <mat-option value="ADMISION">Personal de Admisión y Citas</mat-option>
+              <mat-option value="RRHH">Recursos Humanos / Horarios</mat-option>
+            </mat-select>
+            <mat-icon matPrefix class="mr-2">admin_panel_settings</mat-icon>
+          </mat-form-field>
+
+          <!-- Contraseña -->
+          <mat-form-field appearance="outline">
+            <mat-label>{{ modoEdicion() ? 'Nueva Contraseña (Dejar vacío para mantener)' : 'Contraseña Inicial' }}</mat-label>
+            <input matInput [type]="ocultarPassword() ? 'password' : 'text'" formControlName="password" placeholder="Mínimo 8 caracteres">
+            <mat-icon matPrefix class="mr-2">lock</mat-icon>
+            <button mat-icon-button matSuffix type="button" (click)="toggleOcultarPassword()">
+              <mat-icon>{{ ocultarPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (form.get('password')?.hasError('required') && form.get('password')?.touched) {
+              <mat-error>La contraseña inicial es requerida</mat-error>
+            }
+            @if (form.get('password')?.hasError('minlength') && form.get('password')?.touched) {
+              <mat-error>La contraseña debe tener mínimo 8 caracteres</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Opciones de Cuenta (Toggles) -->
+          <div class="switches-container">
+            <mat-slide-toggle formControlName="debeCambiarClave" color="primary">
+              Exigir cambio de contraseña en próximo inicio de sesión
+            </mat-slide-toggle>
+
+            <mat-slide-toggle formControlName="activo" color="accent">
+              Cuenta habilitada para acceder al sistema
+            </mat-slide-toggle>
+          </div>
+        </form>
+
+        <div class="form-actions mt-3">
+          <button mat-button (click)="cerrarFormulario()">Cancelar</button>
+          <button mat-raised-button color="primary" (click)="guardar()" [disabled]="guardando()">
+            <mat-icon>save</mat-icon> {{ modoEdicion() ? 'Guardar Cambios' : 'Crear Usuario' }}
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Filtros de Búsqueda y Rol -->
+  <mat-card class="filter-card mb-3">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-input">
+          <mat-label>Buscar por usuario, nombre completo o correo...</mat-label>
+          <input matInput [(ngModel)]="search" (keyup.enter)="cargarUsuarios()" placeholder="Escriba y presione Enter...">
+          <mat-icon matSuffix (click)="cargarUsuarios()" style="cursor: pointer;">search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="role-filter">
+          <mat-label>Filtrar por Rol</mat-label>
+          <mat-select [(value)]="filtroRol" (selectionChange)="cargarUsuarios()">
+            <mat-option value="TODOS">Todos los roles</mat-option>
+            <mat-option value="ADMIN">Administrador</mat-option>
+            <mat-option value="DOCTOR">Médico Asistencial</mat-option>
+            <mat-option value="DIGITALIZADOR">Digitalizador</mat-option>
+            <mat-option value="ADMISION">Admisión</mat-option>
+            <mat-option value="RRHH">Recursos Humanos</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tabla de Usuarios -->
+  <mat-card class="table-card">
+    <mat-card-content class="table-container">
+      <table mat-table [dataSource]="usuariosFiltrados()" class="w-100">
+        <!-- Usuario -->
+        <ng-container matColumnDef="usuario">
+          <th mat-header-cell *matHeaderCellDef>Usuario / ID</th>
+          <td mat-cell *matCellDef="let u">
+            <div class="user-cell">
+              <mat-icon class="user-avatar-icon">account_circle</mat-icon>
+              <div>
+                <strong>{{ u.nombreUsuario }}</strong>
+                <span class="user-subid">{{ u.usuarioId }}</span>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Nombre Completo -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef>Nombre Completo</th>
+          <td mat-cell *matCellDef="let u">
+            <div class="user-name">{{ u.nombreCompleto }}</div>
+            <div class="user-email">{{ u.correo }}</div>
+          </td>
+        </ng-container>
+
+        <!-- Rol(es) -->
+        <ng-container matColumnDef="roles">
+          <th mat-header-cell *matHeaderCellDef>Rol Institucional</th>
+          <td mat-cell *matCellDef="let u">
+            @for (r of u.roles; track r.rolId) {
+              <span class="role-badge" [ngClass]="getRoleClass(r.codigo)">
+                {{ r.nombre }}
+              </span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Seguridad / Estado Clave -->
+        <ng-container matColumnDef="seguridad">
+          <th mat-header-cell *matHeaderCellDef>Seguridad</th>
+          <td mat-cell *matCellDef="let u">
+            @if (u.debeCambiarClave) {
+              <span class="security-tag tag-warning" title="Debe renovar su clave al ingresar">
+                <mat-icon>lock_reset</mat-icon> Cambio de Clave Pendiente
+              </span>
+            } @else {
+              <span class="security-tag tag-ok" title="Credenciales al día">
+                <mat-icon>check_circle</mat-icon> Clave Actualizada
+              </span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Estado Activo / Inactivo -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let u">
+            <button
+              mat-button
+              class="status-toggle-btn"
+              [class.status-active]="u.activo !== false"
+              [class.status-inactive]="u.activo === false"
+              (click)="toggleEstado(u)"
+              [title]="u.activo !== false ? 'Haga clic para deshabilitar usuario' : 'Haga clic para habilitar usuario'">
+              <mat-icon>{{ u.activo !== false ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+              {{ u.activo !== false ? 'ACTIVO' : 'INACTIVO' }}
+            </button>
+          </td>
+        </ng-container>
+
+        <!-- Acciones -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let u">
+            <div class="d-flex gap-1">
+              <button mat-icon-button color="primary" (click)="abrirEditar(u)" title="Editar usuario">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="eliminar(u)"
+                [disabled]="esUsuarioActual(u)"
+                [title]="esUsuarioActual(u) ? 'No puede eliminar su propia cuenta' : 'Eliminar usuario'">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+      </table>
+
+      @if (usuariosFiltrados().length === 0) {
+        <div class="empty-state py-4 text-center">
+          <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #94a3b8;">person_off</mat-icon>
+          <p class="mt-2 text-muted">No se encontraron usuarios registrados con el criterio de búsqueda.</p>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

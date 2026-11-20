@@ -1,0 +1,64 @@
+.paciente-form-page {
+  .stepper-card {
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .step-form {
+    padding: 16px 0;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .col-span-2 {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .alert-info-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .summary-box {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+
+    h3 { margin-top: 0; color: #005cb2; }
+    p { margin: 6px 0; font-size: 14px; }
+
+    .hc-preview {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 12px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+  }
+
+  .step-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+  }
+}

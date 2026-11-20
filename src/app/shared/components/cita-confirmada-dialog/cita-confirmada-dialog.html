@@ -1,0 +1,78 @@
+<div class="confirmada-dialog">
+  <div class="header-banner">
+    <div class="icon-circle">
+      <mat-icon>check_circle</mat-icon>
+    </div>
+    <h2>¡Cita Médica Aprobada y Confirmada!</h2>
+    <p class="sub">Instituto Nacional de Salud del Niño - Breña</p>
+  </div>
+
+  <mat-dialog-content class="content-box">
+    <!-- Resumen Clínico de la Cita -->
+    <div class="cita-card">
+      <div class="card-row">
+        <span class="label">Paciente:</span>
+        <strong class="val">{{ data.cita.paciente | nombreCompleto }}</strong>
+      </div>
+      <div class="card-row">
+        <span class="label">N° Historia Clínica:</span>
+        <span class="val hc-badge">{{ data.cita.paciente?.numeroHistoria || 'S/N' }}</span>
+      </div>
+      <div class="card-row">
+        <span class="label">Especialidad:</span>
+        <span class="val">{{ data.cita.especialidad?.nombre || 'Pediatría General' }}</span>
+      </div>
+      <div class="card-row">
+        <span class="label">Médico Tratante:</span>
+        <span class="val">Dr(a). {{ data.cita.medico?.personal?.apellidoPaterno || 'García' }}</span>
+      </div>
+      <div class="card-row highlight-row">
+        <span class="label">Fecha y Turno:</span>
+        <strong class="val">{{ data.cita.fechaHoraInicio | date:'dd/MM/yyyy' }} de {{ data.cita.fechaHoraInicio | date:'HH:mm' }} a {{ data.cita.fechaHoraFin | date:'HH:mm' }}</strong>
+      </div>
+    </div>
+
+    <!-- Canales de Notificación (RN-10) -->
+    <div class="notif-channels">
+      <h4 class="channels-title">
+        <mat-icon color="primary">notifications_active</mat-icon>
+        Canales Notificados al Familiar Responsable (RN-10):
+      </h4>
+
+      <div class="channel-item">
+        <div class="channel-icon mail-icon">
+          <mat-icon>email</mat-icon>
+        </div>
+        <div class="channel-info">
+          <div class="channel-head">
+            <strong>Correo Electrónico Notificado:</strong>
+            <span class="status-badge ok">✔ Notificación Enviada</span>
+          </div>
+          <span class="channel-val">{{ data.correoDestino }}</span>
+          <p class="channel-hint">Se envió el ticket con detalles de la cita y recomendaciones de llegada.</p>
+        </div>
+      </div>
+
+      <div class="channel-item">
+        <div class="channel-icon wa-icon">
+          <mat-icon>chat</mat-icon>
+        </div>
+        <div class="channel-info">
+          <div class="channel-head">
+            <strong>WhatsApp Notificado:</strong>
+            <span class="status-badge ok">✔ Listo para Envío</span>
+          </div>
+          <span class="channel-val">+51 {{ data.whatsappDestino }} ({{ data.responsableNombre }})</span>
+          <p class="channel-hint">Mensaje estructurado con N° de HC, fecha, hora y consultorio.</p>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="cerrar()">Cerrar</button>
+    <button mat-raised-button class="btn-whatsapp" (click)="abrirWhatsApp()" title="Enviar recordatorio por WhatsApp Web">
+      <mat-icon>chat</mat-icon> Abrir WhatsApp Web
+    </button>
+  </mat-dialog-actions>
+</div>

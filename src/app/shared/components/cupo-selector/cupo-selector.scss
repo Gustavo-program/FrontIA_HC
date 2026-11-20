@@ -1,0 +1,63 @@
+.cupo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+
+  .cupo-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    .hora {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .estado-text {
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    &.disponible {
+      border-color: #81c784;
+      color: #2e7d32;
+      background: #f1f8e9;
+
+      &:hover {
+        background: #dcedc8;
+        transform: translateY(-2px);
+      }
+    }
+
+    &.ocupado {
+      border-color: #ffcdd2;
+      color: #c62828;
+      background: #ffebee;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    &.seleccionado {
+      background: #005cb2 !important;
+      color: #ffffff !important;
+      border-color: #003382 !important;
+      box-shadow: 0 2px 8px rgba(0, 92, 178, 0.4);
+    }
+  }
+
+  .no-cupos {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #757575;
+    font-style: italic;
+    padding: 24px;
+  }
+}

@@ -1,0 +1,106 @@
+.atencion-paciente-page {
+  .atencion-tabs {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+
+    .tab-content {
+      padding: 24px;
+    }
+  }
+
+  .form-section-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: none;
+
+    mat-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #005cb2;
+    }
+  }
+
+  .diag-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .med-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+    border-left: 2px solid #cbd5e1;
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 24px;
+
+      .timeline-dot {
+        position: absolute;
+        left: -31px;
+        top: 6px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #005cb2;
+        border: 2px solid #ffffff;
+      }
+
+      .timeline-card {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+
+        .timeline-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 8px;
+
+          .fecha { font-weight: 700; color: #005cb2; font-size: 13px; }
+          .medico { color: #64748b; font-size: 12px; }
+        }
+
+        .timeline-body {
+          p { margin: 4px 0; font-size: 13px; color: #334155; }
+        }
+
+        .diagnosticos-badges {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 8px;
+
+          .diag-chip {
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 12px;
+          }
+        }
+      }
+    }
+  }
+}
