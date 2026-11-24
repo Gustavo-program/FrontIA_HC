@@ -14,13 +14,13 @@ export class StatusChip {
 
   get statusClass(): string {
     const s = this.status?.toUpperCase() || '';
-    if (['APROBADA', 'ACTIVO', 'VALIDADO', 'PROCESADO', 'EXITOSO', 'FINALIZADA', 'COMPLETADO'].includes(s)) {
+    if (['APROBADA', 'ACTIVO', 'VALIDADO', 'PROCESADO', 'EXITOSO', 'FINALIZADA', 'COMPLETADO','COMPLETED'].includes(s)) {
       return 'status-success';
     }
-    if (['PENDIENTE', 'ASIGNADA', 'EN_COLA', 'EN_PROCESO', 'REQUIERE_REVISION', 'BORRADOR'].includes(s)) {
+    if (['PENDIENTE', 'ASIGNADA', 'EN_COLA', 'EN_PROCESO', 'REQUIERE_REVISION', 'BORRADOR','PROCESSING'].includes(s)) {
       return 'status-warning';
     }
-    if (['CANCELADA', 'RECHAZADA', 'ERROR', 'INACTIVO', 'DENEGADO'].includes(s)) {
+    if (['CANCELADA', 'RECHAZADA', 'ERROR', 'INACTIVO', 'DENEGADO', 'FAILED'].includes(s)) {
       return 'status-error';
     }
     if (['ATENDIDA', 'DEVUELTA'].includes(s)) {

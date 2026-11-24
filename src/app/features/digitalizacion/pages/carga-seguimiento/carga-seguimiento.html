@@ -117,7 +117,7 @@
           <td mat-cell *matCellDef="let doc">
             <div class="d-flex align-center gap-1">
               @if (doc.enlaceHC) {
-                <a mat-button color="primary" [routerLink]="doc.enlaceHC" title="Ver Historia Clínica">
+                <a mat-button color="primary" [routerLink]="['/historias', doc.numeroHistoria]" title="Ver Historia Clínica">
                   <mat-icon>visibility</mat-icon> Ver HC
                 </a>
               } @else if (doc.revisionId) {
